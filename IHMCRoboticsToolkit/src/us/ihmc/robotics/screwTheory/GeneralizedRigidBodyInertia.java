@@ -113,6 +113,19 @@ public abstract class GeneralizedRigidBodyInertia
       return centerOfMassOffset;
    }
 
+   public void getCenterOfMassOffset(FramePoint centerOfMassOffsetToPack)
+   {
+      centerOfMassOffsetToPack.setIncludingFrame(expressedInframe, crossPart);
+      centerOfMassOffsetToPack.scale(-1.0 / mass);
+   }
+
+   public void setCenterOfMassOffset(FramePoint centerOfMassOffset)
+   {
+      expressedInframe.checkReferenceFrameMatch(centerOfMassOffset);
+      centerOfMassOffset.get(crossPart);
+      crossPart.scale(- mass);
+   }
+
    public void setMomentOfInertia(double Ixx, double Iyy, double Izz)
    {
       massMomentOfInertiaPart.setIdentity();

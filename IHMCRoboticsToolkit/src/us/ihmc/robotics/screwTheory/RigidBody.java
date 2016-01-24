@@ -14,7 +14,6 @@ public class RigidBody
    private final RigidBodyInertia inertia;
    private final ReferenceFrame bodyFixedFrame;
    private final InverseDynamicsJoint parentJoint;
-   private final FrameVector comOffset;
    private final ArrayList<InverseDynamicsJoint> childrenJoints = new ArrayList<InverseDynamicsJoint>();
    private final List<InverseDynamicsJoint> childrenJointsReadOnly = Collections.unmodifiableList(childrenJoints);
    private final String name;
@@ -25,7 +24,6 @@ public class RigidBody
       this.inertia = null;
       this.bodyFixedFrame = rootBodyFrame;
       this.parentJoint = null;
-      this.comOffset = null;
    }
 
    public RigidBody(String name, RigidBodyInertia inertia, InverseDynamicsJoint parentJoint)
@@ -36,12 +34,6 @@ public class RigidBody
       this.bodyFixedFrame = inertia.getBodyFrame();
       this.parentJoint = parentJoint;
       this.parentJoint.setSuccessor(this);
-
-      this.comOffset = new FrameVector(parentJoint.getFrameAfterJoint());
-      RigidBodyTransform comTransform = inertia.getBodyFrame().getTransformToDesiredFrame(parentJoint.getFrameAfterJoint());
-      comTransform.get(comOffset.getVector());
-      
-      
    }
 
    public RigidBodyInertia getInertia()
@@ -91,19 +83,18 @@ public class RigidBody
 
    public void packCoMOffset(FramePoint comOffsetToPack)
    {
-      comOffsetToPack.setIncludingFrame(comOffset);
+      inertia.getCenterOfMassOffset(comOffsetToPack);
    }
    
    public void setCoMOffset(FramePoint comOffset)
    {
-      this.comOffset.set(comOffset);
+      inertia.setCenterOfMassOffset(comOffset);
    }
 
    public void updateFramesRecursively()
    {
       this.bodyFixedFrame.update();
 
-//      for (InverseDynamicsJoint joint : childrenJoints)
       for(int childIndex = 0; childIndex < childrenJoints.size(); childIndex++)
       {
          childrenJoints.get(childIndex).updateFramesRecursively();
@@ -113,32 +104,6 @@ public class RigidBody
    @Override
    public String toString()
    {
-      StringBuilder builder = new StringBuilder();
-      builder.append(name);
-//      builder.append(name + "\n");
-//      builder.append("Root body: " + isRootBody() + "\n");
-
-//      builder.append("Children joints: ");
-//
-//      if (childrenJoints.isEmpty())
-//      {
-//         builder.append("none");
-//      }
-//      else
-//      {
-//         Iterator<InverseDynamicsJoint> iterator = childrenJoints.iterator();
-//         while (iterator.hasNext())
-//         {
-//            InverseDynamicsJoint joint = iterator.next();
-//            builder.append(joint.getName());
-//
-//            if (iterator.hasNext())
-//            {
-//               builder.append(", ");
-//            }
-//         }
-//      }
-
-      return builder.toString();
+      return name;
    }
 }
